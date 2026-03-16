@@ -31,6 +31,7 @@ export default {
   },
   methods: {
     draw () {
+      if (!this.$el || !this.$el.getContext) return
       const ctx = this.$el.getContext('2d')
       ctx.clearRect(0, 0, this.width, this.height)
       ctx.strokeStyle = this.markColor

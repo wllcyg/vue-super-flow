@@ -43,10 +43,11 @@ export default {
   mounted () {
     this.ctx = this.$el.getContext('2d')
     this.draw()
-    this.graph.add('mousemove', this.rootMousemove)
-    this.$once('hook:beforeDestroy', () => {
-      this.graph.remove('mousemove', this.rootMousemove)
-    })
+    this._mousemoveHandler = this.rootMousemove.bind(this)
+    this.graph.add('mousemove', this._mousemoveHandler)
+  },
+  beforeUnmount () {
+    this.graph.remove('mousemove', this._mousemoveHandler)
   },
   computed: {
     styles () {
@@ -79,6 +80,7 @@ export default {
   },
   methods: {
     draw () {
+      if (!this.ctx) return
       const {
         pointList,
         minX,
@@ -111,6 +113,7 @@ export default {
     },
 
     initLine () {
+      if (!this.ctx) return
       this.ctx.clearRect(0, 0, this.$el.width, this.$el.height)
       if (this.linkStyle) {
         const style = this.linkStyle(this.link)

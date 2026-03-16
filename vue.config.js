@@ -18,11 +18,6 @@ module.exports = {
     sourceMap: false
   },
   configureWebpack: {
-    output: {
-      filename: 'index.js',
-      libraryTarget: 'umd',
-      library: 'SuperFlow',
-      umdNamedDefine: true
-    }
+    // Webpack 5 library build configuration is handled by vue-cli-service build --target lib
   },
 }

@@ -62,12 +62,12 @@ export default {
           if (conf.type === drawerType.node) {
             conf.title = '节点'
             if (this.$refs.nodeSetting) this.$refs.nodeSetting.resetFields()
-            this.$set(this.nodeSetting, 'name', info.meta.name)
-            this.$set(this.nodeSetting, 'desc', info.meta.desc)
+            this.nodeSetting.name = info.meta.name
+            this.nodeSetting.desc = info.meta.desc
           } else {
             conf.title = '连线'
             if (this.$refs.linkSetting) this.$refs.linkSetting.resetFields()
-            this.$set(this.linkSetting, 'desc', info.meta ? info.meta.desc : '')
+            this.linkSetting.desc = info.meta ? info.meta.desc : ''
           }
         },
         cancel: () => {

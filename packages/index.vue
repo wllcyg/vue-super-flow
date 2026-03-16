@@ -56,22 +56,20 @@
       @node-mouseup="nodeMouseup"
       @side-mousedown="sideMousedown"
       @node-contextmenu="nodeContextmenu">
-      <template>
-        <slot
-          name="node"
-          :node="node"
-          :meta="node.meta"
-        />
-      </template>
+      <slot
+        name="node"
+        :node="node"
+        :meta="node.meta"
+      />
     </graph-node>
 
     <graph-menu
-      :visible.sync="menuConf.visible"
+      v-model:visible="menuConf.visible"
       :graph="graph"
       :position="menuConf.position"
       :list="menuConf.list"
       :source="menuConf.source">
-      <template v-slot="{item}">
+      <template #default="{item}">
         <slot
           name="menuItem"
           :item="item"
@@ -249,16 +247,20 @@ export default {
     }
   },
   mounted () {
-    document.addEventListener('mouseup', this.docMouseup)
-    document.addEventListener('mousemove', this.docMousemove)
-    this.$once('hook:beforeDestroy', () => {
-      document.removeEventListener('mouseup', this.docMouseup)
-      document.removeEventListener('mousemove', this.docMousemove)
-    })
+    this._mouseupHandler = this.docMouseup.bind(this)
+    this._mousemoveHandler = this.docMousemove.bind(this)
+
+    document.addEventListener('mouseup', this._mouseupHandler)
+    document.addEventListener('mousemove', this._mousemoveHandler)
+
     this.$nextTick(() => {
       this.graph.initNode(this.nodeList)
       this.graph.initLink(this.linkList)
     })
+  },
+  beforeUnmount () {
+    document.removeEventListener('mouseup', this._mouseupHandler)
+    document.removeEventListener('mousemove', this._mousemoveHandler)
   },
   methods: {
     initMenu (menu, source) {
@@ -295,9 +297,9 @@ export default {
 
     showContextMenu (position, list, source) {
       if (!list.length) return
-      this.$set(this.menuConf, 'position', position)
-      this.$set(this.menuConf, 'list', list)
-      this.$set(this.menuConf, 'source', source)
+      this.menuConf.position = position
+      this.menuConf.list = list
+      this.menuConf.source = source
       this.menuConf.visible = true
     },
 
@@ -475,9 +477,9 @@ export default {
     nodeContextmenu (evt, node) {
       const list = this.initMenu(this.nodeMenu, node)
       if (!list.length) return
-      this.$set(this.menuConf, 'position', getOffset(evt, this.$el))
-      this.$set(this.menuConf, 'list', list)
-      this.$set(this.menuConf, 'source', node)
+      this.menuConf.position = getOffset(evt, this.$el)
+      this.menuConf.list = list
+      this.menuConf.source = node
       this.menuConf.visible = true
     },
 
@@ -488,7 +490,7 @@ export default {
           startAt
         })
         link.movePosition = getOffset(evt, this.$el)
-        this.$set(this.temEdgeConf, 'link', link)
+        this.temEdgeConf.link = link
         this.temEdgeConf.visible = true
       }
     },
@@ -554,8 +556,8 @@ export default {
       this.graph.initLink(this.linkList)
     }
   },
-  install (Vue) {
-    Vue.component(this.name, this)
+  install (app) {
+    app.component(this.name, this)
   }
 }
 </script>
